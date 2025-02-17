@@ -1,6 +1,6 @@
 # frontend-assignment1
 
 
-https://vaibhavdes.github.io/frontend-assignment1/public/
+LIVE : https://vaibhavdes.github.io/frontend-assignment1/build/
 
 #create-react-app is deprecated now.
