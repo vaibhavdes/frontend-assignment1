@@ -41,5 +41,5 @@
   "devDependencies": {
     "gh-pages": "^6.3.0"
   },
-  "homepage": "https://vaibhavdes.github.io/frontend-assignment1/public/"
+  "homepage": "https://vaibhavdes.github.io/frontend-assignment1/build/"
 }
