@@ -12,7 +12,7 @@ const Main = () => {
       {
         "id": "electronics",
         "label": "Electronics",
-        "value": 1400,
+        "value": 1500,
         "children": [
           {
             "id": "phones",
@@ -51,6 +51,27 @@ const Main = () => {
     //setRawData(json)
   },[])
 
+  const updateParent = (value,id, childId) => {
+    const newData = { ...data };
+    const parent = newData.rows.find(row => row.id === id);
+    if (parent) {
+        const oldAmount = parent.value;
+        const childrenAmount = parent.children.reduce((sum, child) => sum + child.value, 0);
+
+        parent.value = value;
+
+        parent.children.forEach(child => {
+            const percentage = (child.value / childrenAmount) * 100;
+            const childAmount = (value * (percentage / 100)).toFixed(2);
+            child.value = parseFloat(childAmount);
+        });
+
+        const variance = ((value - oldAmount) / oldAmount) * 100;
+        parent.variance = variance;
+    }
+    console.log(parent)
+  }
+
   return (
     <div>
         <table border={1} style={{width:"50%"}}>
@@ -60,7 +81,7 @@ const Main = () => {
                 </tr>
             </thead>
             <tbody>
-                {data.rows.map((row)=><Row data={row} level={1}  key={row.id}></Row>)}
+                {data.rows.map((row)=><Row data={row} level={1}  key={row.id} id={row.id} update={updateParent}></Row>)}
             </tbody>
         </table>
     </div>
