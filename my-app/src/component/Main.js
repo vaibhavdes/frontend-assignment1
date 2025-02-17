@@ -48,28 +48,61 @@ const Main = () => {
 
   useEffect(()=>{
     //const json = JSON.parse(data);
-    //setRawData(json)
+    setRawData(data)
   },[])
 
-  const updateParent = (value,id, childId) => {
-    const newData = { ...data };
-    const parent = newData.rows.find(row => row.id === id);
-    if (parent) {
-        const oldAmount = parent.value;
+
+  const updateParent = (changeValue,percentChange, parentId, childId) => {
+    const newData =  JSON.parse(JSON.stringify(rawData));
+    const parent = newData.rows.find(row => row.id === parentId);
+
+    // WHEN CHILD VARIANCE AND AMOUNT CHANGE
+    if(childId && percentChange)
+    {
+      const child = parent.children.find(row => row.id === childId)
+      const amount = child.value;
+      const result = amount + (amount * (percentChange / 100));
+      const change = result - amount;
+      child.value = result;
+      child.variance = percentChange;
+      parent.variance =  change/parent.value * 100;
+      parent.value = parent.value + change;
+    }
+
+    if(childId && changeValue)
+      {
+        const child = parent.children.find(row => row.id === childId)
+        const amount = child.value;
+        const change = changeValue - amount;
+        const result = (change)/amount * 100;
+        child.value = changeValue;
+        child.variance = result;
+        parent.variance =  (changeValue-amount)/parent.value * 100;
+        parent.value = parent.value + (changeValue-amount);
+      }
+
+    // ONLY IF PARENT VARIANCE CHANGE
+    if (childId == null && parent) {
+        const oldParent = data.rows.find(row => row.id === parentId);
+        const oldAmount = oldParent.value;
         const childrenAmount = parent.children.reduce((sum, child) => sum + child.value, 0);
 
-        parent.value = value;
+        parent.value = changeValue;
 
         parent.children.forEach(child => {
+            const childOld = oldParent.children.find(row => row.id === child.id).value;
             const percentage = (child.value / childrenAmount) * 100;
-            const childAmount = (value * (percentage / 100)).toFixed(2);
+            const childAmount = (changeValue * (percentage / 100)).toFixed(4);
+            const variance = (childAmount-childOld)/childOld * 100;
             child.value = parseFloat(childAmount);
+            child.variance = variance;
         });
 
-        const variance = ((value - oldAmount) / oldAmount) * 100;
+        const variance = (changeValue - oldAmount) / oldAmount * 100;
         parent.variance = variance;
     }
-    console.log(parent)
+    console.log(newData)
+    setRawData(newData)
   }
 
   return (
@@ -81,7 +114,7 @@ const Main = () => {
                 </tr>
             </thead>
             <tbody>
-                {data.rows.map((row)=><Row data={row} level={1}  key={row.id} id={row.id} update={updateParent}></Row>)}
+                {rawData && rawData.rows.map((row)=><Row data={row} level={1}  id={row.id} key={row.id} update={updateParent}></Row>)}
             </tbody>
         </table>
     </div>
